@@ -1,6 +1,7 @@
-# OutSystems Browser Enhancements
+# LOBE
 
-A small Chrome extension that applies little enhancements to OutSystems
+**L**ightweight **O**utSystems **B**rowser **E**nhancements — a small Chrome extension
+that applies little enhancements to OutSystems
 platform frontends (Service Center, Lifetime, ODC Portal, Community pages, etc.). 
 
 Each enhancement is a self-contained, easy-to-review file.
@@ -10,6 +11,19 @@ Each enhancement is a self-contained, easy-to-review file.
 
 No build step, no dependencies, nothing leaves your browser. An enhancement can
 be pure CSS, pure JavaScript, or a mix of both.
+
+## Status & feedback
+
+This is an early **work in progress** — free to use as-is, but don't expect too much
+yet. It's maintained by one person in their spare time.
+
+Got feedback, a question, or an idea? Head to
+[**Discussions**](../../discussions) — that's the place for it, and it's genuinely
+welcome. You're also free to fork it and tinker.
+
+Pull requests are limited to collaborators for now, so please share thoughts in
+Discussions rather than sending code — the project is still finding its feet and
+isn't set up to take code contributions yet.
 
 ## Install (unpacked)
 
