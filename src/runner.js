@@ -1,0 +1,152 @@
+// runner.js — loaded LAST, and ONLY as a content script (not in the popup). For
+// each registered enhancement, decides whether it applies to this URL (and the user
+// has switched it on — everything is off by default), then injects its CSS and/or
+// runs its apply(ctx). Keeps everything
+// in sync as the page mutates and as the user toggles enhancements (via
+// chrome.storage) — including live teardown of JS enhancements that provide
+// cleanup (via ctx) or a revert().
+//
+// The popup does NOT talk to this script; it reads the registry directly and
+// writes chrome.storage.sync, which we observe below.
+
+(function () {
+  const reg = window.OSEnhance;
+  if (!reg || !reg._enhancements) {
+    console.error("[OSEnhance] registry.js did not load before runner.js");
+    return;
+  }
+
+  const STORAGE_KEY = "enabledEnhancements";
+  const href = location.href;
+  let enabled = new Set(); // ids the user has switched ON (default: everything off)
+
+  const injectedStyles = new Map(); // id -> <style> element
+  const cleanups = new Map();       // id -> array of teardown fns (from ctx)
+  const applied = new Set();        // ids whose apply() has run and not yet torn down
+
+  const urlMatches = reg.urlMatches; // shared with the popup (defined in registry.js)
+
+  function cssTextFor(e) {
+    const css = typeof e.css === "function" ? e.css(href) : e.css;
+    return typeof css === "string" ? css : "";
+  }
+
+  function injectCss(e) {
+    const css = cssTextFor(e);
+    if (!css) return;
+    let el = injectedStyles.get(e.id);
+    if (!el) {
+      el = document.createElement("style");
+      el.setAttribute("data-ose-id", e.id);
+      (document.head || document.documentElement).appendChild(el);
+      injectedStyles.set(e.id, el);
+    }
+    if (el.textContent !== css) el.textContent = css; // idempotent
+  }
+
+  function removeCss(id) {
+    const el = injectedStyles.get(id);
+    if (el) {
+      el.remove();
+      injectedStyles.delete(id);
+    }
+  }
+
+  // Run a JS enhancement's teardown: its ctx cleanups (LIFO) then its revert().
+  function teardownJs(e) {
+    const list = cleanups.get(e.id);
+    if (list) {
+      for (let i = list.length - 1; i >= 0; i--) {
+        try {
+          list[i]();
+        } catch (err) {
+          console.error("[OSEnhance] cleanup failed:", e.id, err);
+        }
+      }
+      cleanups.delete(e.id);
+    }
+    if (typeof e.revert === "function") {
+      try {
+        e.revert();
+      } catch (err) {
+        console.error("[OSEnhance] revert failed:", e.id, err);
+      }
+    }
+  }
+
+  // Bring the page in line with which enhancements are on. Safe to call repeatedly.
+  function sync() {
+    for (const e of reg._enhancements) {
+      const on = urlMatches(e.match, href) && enabled.has(e.id);
+      if (on) {
+        if (e.css != null) injectCss(e);
+        if (typeof e.apply === "function") {
+          let list = cleanups.get(e.id);
+          if (!list) {
+            list = [];
+            cleanups.set(e.id, list);
+          }
+          const ctx = reg.makeCtx((fn) => list.push(fn));
+          try {
+            e.apply(ctx);
+          } catch (err) {
+            console.error("[OSEnhance] Enhancement failed:", e.id, err);
+          }
+          applied.add(e.id);
+        }
+      } else {
+        if (e.css != null) removeCss(e.id);
+        if (applied.has(e.id)) {
+          teardownJs(e);
+          applied.delete(e.id);
+        }
+      }
+    }
+  }
+
+  // React to toggles from the popup. The popup only writes chrome.storage.sync —
+  // it never messages this content script — so toggling works regardless of this
+  // script's liveness, and the page updates live here.
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === "sync" && changes[STORAGE_KEY]) {
+      enabled = new Set(changes[STORAGE_KEY].newValue || []);
+      sync();
+    }
+  });
+
+  let observing = false;
+  function start() {
+    const active = reg._enhancements.filter(
+      (e) => urlMatches(e.match, href) && enabled.has(e.id)
+    );
+    if (active.length) {
+      console.debug(
+        "[OSEnhance] Active on this page:",
+        active.map((e) => e.id).join(", ")
+      );
+    }
+    sync();
+
+    if (observing) return;
+    observing = true;
+    // Re-apply on DOM changes (OutSystems rebuilds chunks of the page after load).
+    // Debounced to one run per frame. injectCss/apply are idempotent, so re-runs
+    // triggered by our own edits settle immediately without looping.
+    let scheduled = false;
+    const observer = new MutationObserver(() => {
+      if (scheduled) return;
+      scheduled = true;
+      requestAnimationFrame(() => {
+        scheduled = false;
+        sync();
+      });
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+  }
+
+  // Load the user's enabled set, then start. Nothing runs until the user opts in.
+  chrome.storage.sync.get({ [STORAGE_KEY]: [] }, (res) => {
+    enabled = new Set(res[STORAGE_KEY] || []);
+    start();
+  });
+})();

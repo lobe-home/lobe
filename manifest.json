@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "OutSystems Browser Enhancements",
+  "version": "0.1.0",
+  "description": "A community collection of small enhancements for OutSystems platform frontends (Service Center, Lifetime, Community pages, etc.). Each enhancement is self-contained and easy to review.",
+  "permissions": ["storage", "activeTab", "clipboardWrite"],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "OutSystems Browser Enhancements"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.outsystemscloud.com/*",
+        "https://*.outsystemsenterprise.com/*",
+        "https://www.outsystems.com/forums/*"
+      ],
+      "js": [
+        "src/registry.js",
+        "src/categories.js",
+        "src/enhancements/o11-service-center/widen-rest-api-base-url.js",
+        "src/enhancements/o11-service-center/copy-rest-webreference-base-url.js",
+        "src/enhancements/o11-service-center/copy-url-in-table-cells.js",
+        "src/enhancements/o11-service-center/quick-range-log-filters.js",
+        "src/enhancements/outsystems-forums/hide-forum-2026-bg-sections.js",
+        "src/enhancements/outsystems-forums/hide-ranking.js",
+        "src/runner.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ]
+}

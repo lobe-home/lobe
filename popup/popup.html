@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="popup.css" />
+    <title>OutSystems Browser Enhancements</title>
+  </head>
+  <body>
+    <header>
+      <h1>OutSystems Browser Enhancements</h1>
+      <p id="subtitle">Loading…</p>
+      <div id="bulk" class="bulk" hidden>
+        <button id="enableAll" type="button" class="link-btn">Enable all</button>
+        <span class="sep">·</span>
+        <button id="disableAll" type="button" class="link-btn">Disable all</button>
+      </div>
+    </header>
+
+    <nav id="tabs" class="tabs" hidden></nav>
+
+    <div id="categoryHeader" class="category-header" hidden></div>
+
+    <div id="panel" class="panel"></div>
+
+    <p id="empty" class="empty" hidden></p>
+
+    <div id="reloadBar" class="reload-bar" hidden>
+      <span>Changes apply after reloading the page.</span>
+      <button id="reloadBtn" type="button">Reload page</button>
+    </div>
+
+    <footer>
+      <span>Unofficial · community-maintained</span>
+    </footer>
+
+    <!-- Single entry point: bootstrap.js reads the enhancement list from the
+         manifest (the one source of truth) and injects registry.js + categories.js
+         + every enhancement, then popup.js. Adding an enhancement needs no change
+         here — only a line in manifest.json. -->
+    <script src="bootstrap.js"></script>
+  </body>
+</html>
