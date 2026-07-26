@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240" role="img" aria-label="LOBE — a low bee, head bowed, looking down">
+  <defs>
+    <clipPath id="head"><circle cx="120" cy="132" r="76"/></clipPath>
+    <clipPath id="eyeL"><circle cx="99" cy="124" r="19"/></clipPath>
+    <clipPath id="eyeR"><circle cx="141" cy="124" r="19"/></clipPath>
+  </defs>
+
+  <!-- wings -->
+  <ellipse cx="80" cy="82" rx="34" ry="19" fill="#E7EEFA" stroke="#C7D4EC" stroke-width="3" transform="rotate(-38 80 82)"/>
+  <ellipse cx="160" cy="82" rx="34" ry="19" fill="#E7EEFA" stroke="#C7D4EC" stroke-width="3" transform="rotate(38 160 82)"/>
+
+  <!-- head -->
+  <circle cx="120" cy="132" r="76" fill="#F6C445" stroke="#E2A62A" stroke-width="4"/>
+
+  <!-- black stripes along the bottom -->
+  <g clip-path="url(#head)">
+    <rect x="40" y="184" width="160" height="13" fill="#2B2B2B"/>
+    <rect x="40" y="202" width="160" height="14" fill="#2B2B2B"/>
+  </g>
+
+  <!-- antennae: gentle arc, splaying outward over the temples; lopsided droop -->
+  <g fill="none" stroke="#2B2B2B" stroke-width="5" stroke-linecap="round">
+    <path d="M106 64 C100 46, 86 54, 80 88"/>
+    <path d="M134 64 C140 46, 154 54, 160 76"/>
+  </g>
+  <circle cx="80" cy="88" r="6" fill="#2B2B2B"/>
+  <circle cx="160" cy="76" r="6" fill="#2B2B2B"/>
+
+  <!-- the face (eyes, brows, mouth, tear) nudged toward his down-left gaze -->
+  <g transform="translate(-5 3)">
+
+  <!-- left eye: open bowl; bottom curve + lid crease share the corner points (no notch) -->
+  <circle cx="99" cy="124" r="19" fill="#fff"/>
+  <circle cx="94" cy="132" r="9" fill="#2B2B2B"/>
+  <circle cx="91" cy="135" r="2.5" fill="#fff"/>
+  <path d="M81 118 A19 19 0 0 1 117 118 Q99 131 81 118 Z" fill="#F6C445"/>
+  <path d="M81 118 A19 19 0 1 0 117 118" fill="none" stroke="#2B2B2B" stroke-width="3" stroke-linecap="round"/>
+  <path d="M117 118 Q99 131 81 118" fill="none" stroke="#2B2B2B" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- right eye -->
+  <circle cx="141" cy="124" r="19" fill="#fff"/>
+  <circle cx="136" cy="132" r="9" fill="#2B2B2B"/>
+  <circle cx="133" cy="135" r="2.5" fill="#fff"/>
+  <path d="M123 118 A19 19 0 0 1 159 118 Q141 131 123 118 Z" fill="#F6C445"/>
+  <path d="M123 118 A19 19 0 1 0 159 118" fill="none" stroke="#2B2B2B" stroke-width="3" stroke-linecap="round"/>
+  <path d="M159 118 Q141 131 123 118" fill="none" stroke="#2B2B2B" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- sad eyebrows (inner ends raised) -->
+  <g stroke="#2B2B2B" stroke-width="5" stroke-linecap="round">
+    <path d="M74 100 L104 92"/>
+    <path d="M136 92 L166 100"/>
+  </g>
+
+  <!-- flat, deadpan mouth -->
+  <path d="M101 170 H139" fill="none" stroke="#2B2B2B" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- a single tear -->
+  <path d="M158 140 C153 149, 152 157, 158 159 C164 157, 163 149, 158 140 Z" fill="#7FBEEA"/>
+  <circle cx="156" cy="153" r="1.8" fill="#fff" opacity="0.8"/>
+
+  </g>
+</svg>

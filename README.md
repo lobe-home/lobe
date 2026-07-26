@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/lobe.svg" alt="LOBE — a glum little bee" width="140" />
+</p>
+
 # LOBE
 
 **L**ightweight **O**utSystems **B**rowser **E**nhancements — a small Chrome extension
