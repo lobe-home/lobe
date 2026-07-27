@@ -40,6 +40,7 @@
         "src/enhancements/o11-service-center/copy-rest-webreference-base-url.js",
         "src/enhancements/o11-service-center/copy-url-in-table-cells.js",
         "src/enhancements/o11-service-center/quick-range-log-filters.js",
+        "src/enhancements/o11-service-center/general-logs-filter-maxlength.js",
         "src/enhancements/odc-portal/avatar-group-role-summary.js",
         "src/enhancements/outsystems-forums/hide-forum-2026-bg-sections.js",
         "src/enhancements/outsystems-forums/hide-ranking.js",
