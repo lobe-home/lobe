@@ -100,6 +100,14 @@ enhancement's category is simply the folder it lives in — read from the file's
 path, so there's no `category` property to keep in sync. The popup renders one tab
 per category.
 
+A category entry may also carry an optional **`match`** — a hint (same matcher types
+as an enhancement: `RegExp | string | fn | array`, see `OSEnhance.urlMatches`) for
+which tab the popup opens on. When no enhancement applies to the current page, the
+popup opens the first category whose `match` covers the URL — so a developer anywhere
+in Service Center lands on that category even on a page LOBE doesn't specifically
+patch. An enhancement that *is* live on the page still wins over these hints. (Use a
+`RegExp` for case-insensitive path matches, e.g. `[/\/servicecenter\//i]`.)
+
 To add a category: add an entry to `src/categories.js` and create the matching
 `src/enhancements/<id>/` subfolder.
 

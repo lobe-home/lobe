@@ -524,12 +524,19 @@ function render(categories, enhancements) {
 
   renderTabs(order);
 
-  // Default to the first real category with something on this page; otherwise fall
-  // back to the All tab (a useful overview when nothing matches).
+  // Which tab to open on, in priority order:
+  //   1. the first real category with an enhancement live on this page;
+  //   2. else the first category whose `match` hint covers the URL (e.g. anywhere in
+  //      Service Center, even on a page LOBE doesn't specifically patch);
+  //   3. else the All overview.
+  const reg = window.OSEnhance;
   const firstOnPage = realOrder.find((c) =>
     (byCategory.get(c.id) || []).some((e) => e.matches)
   );
-  selectCategory(firstOnPage ? firstOnPage.id : ALL_ID);
+  const firstHinted = realOrder.find(
+    (c) => c.match && reg.urlMatches(c.match, currentUrl)
+  );
+  selectCategory((firstOnPage || firstHinted || { id: ALL_ID }).id);
 }
 
 async function main() {
