@@ -12,6 +12,9 @@
   "permissions": ["storage", "activeTab", "clipboardWrite", "scripting"],
   "optional_host_permissions": ["https://*/*"],
   "background": { "service_worker": "src/background.js" },
+  "web_accessible_resources": [
+    { "resources": ["assets/lobe.svg"], "matches": ["https://*/*"] }
+  ],
   "action": {
     "default_popup": "popup/popup.html",
     "default_title": "OutSystems Browser Enhancements",
@@ -27,7 +30,8 @@
       "matches": [
         "https://*.outsystemscloud.com/*",
         "https://*.outsystemsenterprise.com/*",
-        "https://*.outsystems.com/*"
+        "https://*.outsystems.com/*",
+        "https://*.outsystems.dev/*"
       ],
       "js": [
         "src/registry.js",
@@ -36,6 +40,7 @@
         "src/enhancements/o11-service-center/copy-rest-webreference-base-url.js",
         "src/enhancements/o11-service-center/copy-url-in-table-cells.js",
         "src/enhancements/o11-service-center/quick-range-log-filters.js",
+        "src/enhancements/odc-portal/avatar-group-role-summary.js",
         "src/enhancements/outsystems-forums/hide-forum-2026-bg-sections.js",
         "src/enhancements/outsystems-forums/hide-ranking.js",
         "src/runner.js"
