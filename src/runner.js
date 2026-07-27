@@ -23,6 +23,7 @@
   const injectedStyles = new Map(); // id -> <style> element
   const cleanups = new Map();       // id -> array of teardown fns (from ctx)
   const applied = new Set();        // ids whose apply() has run and not yet torn down
+  let observer = null;              // MutationObserver, kept so teardown can disconnect it
 
   const urlMatches = reg.urlMatches; // shared with the popup (defined in registry.js)
 
@@ -105,14 +106,40 @@
   }
 
   // React to toggles from the popup. The popup only writes chrome.storage.sync —
-  // it never messages this content script — so toggling works regardless of this
-  // script's liveness, and the page updates live here.
-  chrome.storage.onChanged.addListener((changes, area) => {
+  // so toggling works regardless of this script's liveness, and the page updates live.
+  function onStorageChanged(changes, area) {
     if (area === "sync" && changes[STORAGE_KEY]) {
       enabled = new Set(changes[STORAGE_KEY].newValue || []);
       sync();
     }
-  });
+  }
+  chrome.storage.onChanged.addListener(onStorageChanged);
+
+  // Full teardown, sent by the background worker when the user turns this whole
+  // DOMAIN off (its host permission is being revoked). Reverts every enhancement the
+  // same way switching one off does — removeCss + teardownJs — then goes dormant, so
+  // a live tab is cleaned up immediately instead of only on its next reload.
+  function teardownAll() {
+    for (const e of reg._enhancements) {
+      if (e.css != null) removeCss(e.id);
+      if (applied.has(e.id)) {
+        teardownJs(e);
+        applied.delete(e.id);
+      }
+    }
+    enabled = new Set(); // a stray sync() must not re-apply anything
+    if (observer) {
+      observer.disconnect();
+      observer = null;
+    }
+    observing = false;
+    chrome.storage.onChanged.removeListener(onStorageChanged);
+    chrome.runtime.onMessage.removeListener(onMessage);
+  }
+  function onMessage(msg) {
+    if (msg && msg.ose === "teardown") teardownAll();
+  }
+  chrome.runtime.onMessage.addListener(onMessage);
 
   let observing = false;
   function start() {
@@ -133,7 +160,7 @@
     // Debounced to one run per frame. injectCss/apply are idempotent, so re-runs
     // triggered by our own edits settle immediately without looping.
     let scheduled = false;
-    const observer = new MutationObserver(() => {
+    observer = new MutationObserver(() => {
       if (scheduled) return;
       scheduled = true;
       requestAnimationFrame(() => {

@@ -8,12 +8,12 @@
   </head>
   <body>
     <header>
-      <h1>OutSystems Browser Enhancements</h1>
-      <p id="subtitle">Loading…</p>
-      <div id="bulk" class="bulk" hidden>
-        <button id="enableAll" type="button" class="link-btn">Enable all</button>
-        <span class="sep">·</span>
-        <button id="disableAll" type="button" class="link-btn">Disable all</button>
+      <div class="brand">
+        <img class="brand-bee" src="../assets/lobe.svg" alt="" width="40" height="40" />
+        <div class="brand-text">
+          <h1>LOBE</h1>
+          <p class="tagline">Lightweight OutSystems Browser Enhancements</p>
+        </div>
       </div>
     </header>
 
@@ -30,8 +30,33 @@
       <button id="reloadBtn" type="button">Reload page</button>
     </div>
 
+    <!-- Sites manager overlay (opened from the footer). -->
+    <div id="sitesView" class="sites-view" hidden>
+      <div class="sites-head">
+        <span class="sites-title">Sites</span>
+      </div>
+      <div id="sitesList" class="sites-list"></div>
+      <!-- "Add this site" — shown only while the current page is an addable
+           OutSystems page; once added it appears under "Added by you" instead. -->
+      <div id="addSiteBanner" class="site-banner" hidden>
+        <span id="addSiteText" class="site-banner-text"></span>
+        <label class="switch" title="Run LOBE on this site">
+          <input type="checkbox" id="addSiteSwitch" />
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="sites-foot">
+        <button id="sitesBack" type="button" class="link-btn">← Back</button>
+      </div>
+    </div>
+
     <footer>
-      <span>Unofficial · community-maintained</span>
+      <button id="manageSites" type="button" class="link-btn">Sites</button>
+      <div class="fontsize">
+        <button id="fsDown" class="fs-btn" type="button" aria-label="Smaller text">A−</button>
+        <span id="fsValue" class="fontsize-value">100%</span>
+        <button id="fsUp" class="fs-btn" type="button" aria-label="Larger text">A+</button>
+      </div>
     </footer>
 
     <!-- Single entry point: bootstrap.js reads the enhancement list from the
