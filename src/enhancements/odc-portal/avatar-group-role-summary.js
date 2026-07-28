@@ -40,7 +40,10 @@
       "shows the full \"... users have this role\" count as a larger label in place of " +
       "the \"99+\" counter.",
 
-    match: /\/usersaccess\/organizationrole/i,
+    // Only the singular role DETAIL page (…/organizationrole?roleid=…), not the plural
+    // LIST page (…/organizationroles). The (?!s) stops "organizationrole" from also
+    // matching inside "organizationroles".
+    match: /\/usersaccess\/organizationrole(?!s)/i,
 
     css: `
       /* Hide the avatar pile — the summary text stands in for it. */

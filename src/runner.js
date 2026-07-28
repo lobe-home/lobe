@@ -18,7 +18,12 @@
 
   const STORAGE_KEY = "enabledEnhancements";
   const MARK_KEY = "markChanges";   // "Mark LOBE changes on page" (Settings) — default ON
-  const href = location.href;
+  // The current URL. On SPA platforms (e.g. the ODC Portal) navigation changes the URL
+  // via the History API without reloading the content script, so this must be re-read,
+  // not captured once — otherwise enhancements match the wrong (stale) page: they fail
+  // to activate on SPA-navigated pages, and stay active (badge and all) after leaving.
+  // sync() refreshes it every run.
+  let href = location.href;
   let enabled = new Set(); // ids the user has switched ON (default: everything off)
   let markOn = true;       // show LOBE's stamp/branding (default ON; user can turn off)
 
@@ -151,6 +156,7 @@
 
   // Bring the page in line with which enhancements are on. Safe to call repeatedly.
   function sync() {
+    href = location.href; // refresh for SPA navigations (see the `href` note above)
     const active = [];
     for (const e of reg._enhancements) {
       const on = urlMatches(e.match, href) && enabled.has(e.id);
@@ -218,6 +224,8 @@
       observer = null;
     }
     observing = false;
+    window.removeEventListener("popstate", sync);
+    window.removeEventListener("hashchange", sync);
     chrome.storage.onChanged.removeListener(onStorageChanged);
     chrome.runtime.onMessage.removeListener(onMessage);
   }
@@ -254,6 +262,12 @@
       });
     });
     observer.observe(document.documentElement, { childList: true, subtree: true });
+
+    // SPA navigation changes the URL without a reload. The observer above already
+    // catches the DOM changes a pushState navigation causes; also react to history
+    // back/forward and hash changes directly, so we re-sync (and re-read href) promptly.
+    window.addEventListener("popstate", sync);
+    window.addEventListener("hashchange", sync);
   }
 
   // Load the user's enabled set + the "mark changes" setting, then start. Nothing runs
