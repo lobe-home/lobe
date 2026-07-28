@@ -1,7 +1,9 @@
-// Enhancement: Raise a filter input's maxlength on the General Logs page.
+// Enhancement: Raise a filter input's maxlength on the General/Error Logs pages.
 //
-// On General_Logs.aspx a column filter <input> is capped at maxlength=50, too short to
-// paste longer search values into. This bumps it to 500.
+// On General_Logs.aspx and Error_Logs.aspx a column filter <input> (the message/text
+// filter) is capped at maxlength=50, too short to paste longer search values into. This
+// bumps it to 500. Both pages place that filter in the same column, so its input shares
+// the stable id tail "_wtContentColumn3_wtInput1".
 //
 // OutSystems input ids look like "wt28_..._wtContentColumn3_wtInput1": the leading
 // "wt<n>_" parts are auto-generated and can change when the app is republished, so we
@@ -17,13 +19,15 @@
   const NEW_MAX = "500";
 
   OSEnhance.register({
+    // id kept as-is (not renamed to a generic name) so existing opt-ins — stored by
+    // id — keep working now that it also covers Error Logs.
     id: "general-logs-filter-maxlength",
-    title: "Longer filter field on General Logs",
+    title: "Longer filter field on General & Error Logs",
     description:
-      "On the General Logs page, raises the max length of the column filter input from " +
-      "50 to 500 characters, so you can paste longer search values.",
+      "On the General Logs and Error Logs pages, raises the max length of the message " +
+      "column filter input from 50 to 500 characters, so you can paste longer search values.",
 
-    match: /\/servicecenter\/General_Logs\.aspx/i,
+    match: /\/servicecenter\/(?:General|Error)_Logs\.aspx/i,
 
     // A light LOBE touch on the field comes from the shared .ose-lobe-field class
     // (the gold left bar — the same accent used on every field LOBE affects), added
