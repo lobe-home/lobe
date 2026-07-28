@@ -83,9 +83,11 @@
         display: block !important;
       }
 
-      /* --- This enhancement's own element: the copy button, in LOBE colours ---
-         Too small to hold the bee, so it wears the honey/gold palette (shared
-         --lobe-* vars from stamp.baseCss) instead — enough to read as LOBE's. */
+      /* --- This enhancement's own element: the copy button. ---
+         Its base look is a plain neutral button (this is a LOBE-injected control, so
+         it needs SOME styling to be usable — that's this enhancement's own choice, not
+         a global default). The LOBE honey/gold is layered on only while marking is on
+         (below), so with marks off the button is just a plain grey button. */
       .ose-copy-btn {
         /* border-box so total width stays a predictable 26px (the page has no
            CSS reset that would otherwise let padding/border expand it). */
@@ -98,16 +100,27 @@
         padding: 4px;
         width: 26px;
         height: 26px;
-        color: var(--lobe-ink);
-        background: var(--lobe-honey);
-        border: 1px solid var(--lobe-gold);
+        color: #444;
+        background: #fff;
+        border: 1px solid #bbb;
         border-radius: 5px;
         cursor: pointer;
         line-height: 0;
       }
-      .ose-copy-btn:hover { background: var(--lobe-honey-hover); border-color: var(--lobe-ink); }
-      /* Keep a green "copied!" confirmation — success reads clearer than brand here. */
+      .ose-copy-btn:hover { background: #f0f0f0; border-color: #888; }
+      /* Green "copied!" confirmation — success reads clearer than brand here. */
       .ose-copy-btn.ose-copied { color: #1f7a34; border-color: #1f7a34; }
+
+      /* LOBE stamp: honey/gold, only while marking is on (too small to hold the bee). */
+      :root:not(.ose-marks-off) .ose-copy-btn {
+        color: var(--lobe-ink);
+        background: var(--lobe-honey);
+        border-color: var(--lobe-gold);
+      }
+      :root:not(.ose-marks-off) .ose-copy-btn:hover {
+        background: var(--lobe-honey-hover);
+        border-color: var(--lobe-ink);
+      }
     `,
 
     // Uses ctx so the framework can remove the button (and its listener) when the

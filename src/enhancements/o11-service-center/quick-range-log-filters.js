@@ -181,7 +181,9 @@
     match: /\/servicecenter\/\w+_Logs?\.aspx/i,
 
     css: `
-      /* The toggle wears LOBE colours (shared --lobe-* vars from stamp.baseCss). */
+      /* Base look is a plain neutral button (a LOBE-injected control needs SOME styling
+         to be usable — this enhancement's own choice, not a global default). The LOBE
+         honey/gold is layered on only while marking is on (further below). */
       .ose-qr-toggle {
         box-sizing: border-box;
         display: inline-flex;
@@ -190,25 +192,26 @@
         width: 32px;
         height: 32px;
         padding: 0;
-        color: var(--lobe-ink);
-        background: var(--lobe-honey);
-        border: 1px solid var(--lobe-gold);
+        color: #333;
+        background: #fff;
+        border: 1px solid #bbb;
         border-radius: 5px;
         cursor: pointer;
         line-height: 0;
       }
-      .ose-qr-toggle:hover { background: var(--lobe-honey-hover); border-color: var(--lobe-ink); }
-      .ose-qr-toggle[aria-expanded="true"] { background: var(--lobe-honey-hover); border-color: var(--lobe-ink); }
+      .ose-qr-toggle:hover { background: #f0f0f0; border-color: #888; }
+      .ose-qr-toggle[aria-expanded="true"] { background: #e6e6e6; border-color: #888; }
 
       /* Anchored to <body> and fixed-positioned so the filter row's overflow /
          stacking context can't clip it. It's a column: a LOBE-branded header on top,
-         then the two sections side by side as columns (so it stays short). */
+         then the two sections side by side as columns (so it stays short). Neutral
+         border by default; LOBE gold added only while marking is on. */
       .ose-qr-menu {
         position: fixed;
         z-index: 2147483000;
         padding: 6px;
         background: #fff;
-        border: 1px solid var(--lobe-gold);
+        border: 1px solid #bbb;
         border-radius: 6px;
         box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
         display: none;
@@ -263,6 +266,20 @@
         white-space: nowrap;
       }
       .ose-qr-item:hover { background: #f0f0f0; }
+
+      /* LOBE stamp: honey/gold on the toggle and a gold menu border, only while marking
+         is on. With marks off these don't apply, leaving the neutral base above. */
+      :root:not(.ose-marks-off) .ose-qr-toggle {
+        color: var(--lobe-ink);
+        background: var(--lobe-honey);
+        border-color: var(--lobe-gold);
+      }
+      :root:not(.ose-marks-off) .ose-qr-toggle:hover,
+      :root:not(.ose-marks-off) .ose-qr-toggle[aria-expanded="true"] {
+        background: var(--lobe-honey-hover);
+        border-color: var(--lobe-ink);
+      }
+      :root:not(.ose-marks-off) .ose-qr-menu { border-color: var(--lobe-gold); }
     `,
 
     // ctx-routed so switching this off removes the button, the menu, and (via the

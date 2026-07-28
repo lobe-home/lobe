@@ -195,7 +195,10 @@ colours, and your enhancement will match the rest and respect the user's toggle 
 - **`stamp.baseCss`** — a stylesheet the runner injects once while any enhancement is
   active. It declares the palette as CSS variables (`--lobe-honey`,
   `--lobe-honey-hover`, `--lobe-gold`, `--lobe-ink`), so your `css` can just use
-  `var(--lobe-gold)` etc., plus a few reusable classes:
+  `var(--lobe-gold)` etc. The palette is **theme-aware**: it swaps to LOBE's dark
+  variants under `@media (prefers-color-scheme: dark)`, the same way the popup themes
+  itself — so as long as you drive colour through the variables, your stamp follows
+  light/dark automatically. It also provides a few reusable classes:
   - `.ose-lobe-field` — the shared input accent (a thin gold left bar). Put it on any
     field you touch — `ctx.addClass(input, "ose-lobe-field")` — so every affected
     field looks the same.
@@ -210,11 +213,30 @@ colours, and your enhancement will match the rest and respect the user's toggle 
 
 **The "Mark LOBE changes on page" toggle.** The popup's Settings overlay has one
 switch (default on, stored in `chrome.storage.sync` under `markChanges`). When it's
-off, the runner adds `.ose-marks-off` to `<html>`: the `--lobe-*` variables drop to a
-neutral grey/white and the decorative bits (bees, corner badge, field bars,
-`.ose-lobe-mark` elements) hide. Because every LOBE colour is a variable, anything you
-build on `stamp` follows the toggle automatically — no extra work. Only the LOBE
-*look* goes away; your enhancement keeps working.
+off, the runner adds `.ose-marks-off` to `<html>` and LOBE does as *little* as
+possible: it hides the decoration it added itself (bees, corner badge, `.ose-lobe-mark`
+elements, the `.ose-lobe-field` bar) and otherwise **imposes nothing** — no forced
+neutral, no forced transparent. The page keeps whatever it natively had.
+
+So when you add colour, **gate it so it only applies while marking is on** — put the
+colour rules under `:root:not(.ose-marks-off) <your-selector>` and keep the enhancement's
+*functional* size/layout ungated:
+
+```css
+/* Functional — always: size the label to fit the text, no colours. */
+.my-widget { min-width: 340px; padding: 6px 30px; font-size: 16px; }
+/* LOBE stamp — only while marking is on: the colours. */
+:root:not(.ose-marks-off) .my-widget {
+  background: var(--lobe-honey); color: var(--lobe-ink); border: 1px solid var(--lobe-gold);
+}
+```
+
+For an element that already exists on the page, that means with marks off it keeps its
+own native colours (correct in the page's light/dark theme). For an element LOBE itself
+injects (which has no native styling), give it a plain base look and layer the LOBE
+colours on top with the same gate — that base is your enhancement's own choice, not a
+global default. Either way: **drive colour through the `--lobe-*` variables, never
+hardcode it, keep size/layout separate, and gate the colour.**
 
 ### Guidelines for shareable enhancements
 

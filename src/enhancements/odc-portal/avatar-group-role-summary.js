@@ -8,6 +8,11 @@
 // little LOBE "stamp" — the bee mascot plus LOBE's honey/gold palette. (Showing the
 // mascot on the page needs assets/lobe.svg listed under web_accessible_resources.)
 //
+// Only the COLOURS + mascot are the stamp; the label's size stays either way. With
+// "Mark LOBE changes" off, the honey/gold surface simply isn't applied, so the label
+// keeps the page's own background/text colour — correct in the ODC Portal's dark theme
+// too, rather than an imposed light chip. LOBE adds no colour of its own when off.
+//
 // The page loads the avatars and count asynchronously (Neo SkeletonLoader), so the
 // counter and its tooltip text only appear once data arrives. The runner re-invokes
 // apply() on DOM mutations; every step is idempotent (a marker attribute) and routed
@@ -41,9 +46,13 @@
       /* Hide the avatar pile — the summary text stands in for it. */
       .avatar-group-list { display: none !important; }
 
-      /* The counter chip becomes a LOBE "stamp": the honey/gold look (via the shared
-         --lobe-* palette from stamp.baseCss) plus the bee, a touch bigger. Only the
-         page-specific sizing lives here; the colours are LOBE's single source. */
+      /* Reshape the "99+" counter into a readable summary label. This block is the
+         FUNCTIONAL part — size, SHAPE, layout and type so the full count fits — and
+         applies whether or not the stamp is on, so the shape stays constant either way.
+         (The native counter is a round badge; stretched to the text it goes elliptical,
+         so we pin border-radius here to keep the same rounded-rectangle in both states.)
+         No colours here, so with marks off the label keeps the page's OWN background/
+         text colour (correct in ODC Portal's dark theme too); nothing is imposed. */
       .avatar-group-counter {
         display: inline-flex !important;
         align-items: center !important;
@@ -52,10 +61,7 @@
         min-width: 340px !important;             /* fixed minimum width */
         height: auto !important;
         padding: 6px 30px !important;
-        border-radius: 18px !important;
-        border: 2px solid var(--lobe-gold) !important;
-        background: var(--lobe-honey) !important;
-        color: var(--lobe-ink) !important;
+        border-radius: 18px !important;          /* shape — kept constant on/off */
         overflow: visible !important;
         justify-content: center !important;      /* centre the bee + text in the wider chip */
         white-space: nowrap !important;
@@ -63,9 +69,19 @@
         font-weight: 700 !important;
         letter-spacing: 0.02em !important;       /* widens the text itself a touch */
         line-height: 1.5 !important;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14) !important;
       }
       .avatar-group-counter > span { font-size: inherit !important; color: inherit !important; }
+
+      /* The LOBE stamp — the coloured surface ONLY — while marking is on (i.e. <html>
+         has no .ose-marks-off): the honey/gold fill, border and shadow (via the shared
+         --lobe-* palette). With marks off none of it applies, so the label shows in the
+         page's native colours — same shape/size, just no LOBE colour. */
+      :root:not(.ose-marks-off) .avatar-group-counter {
+        border: 2px solid var(--lobe-gold) !important;
+        background: var(--lobe-honey) !important;
+        color: var(--lobe-ink) !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14) !important;
+      }
       /* Bump the shared bee (.ose-lobe-stamp, 18px) up for this larger chip. */
       .avatar-group-counter .ose-lobe-stamp { width: 22px !important; height: 22px !important; }
     `,
