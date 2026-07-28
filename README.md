@@ -4,7 +4,7 @@
 
 # LOBE  (🔊 LOH-bee)
 
-**L**ightweight **O**utSystems **B**rowser **E**nhancements
+**L**ittle **O**utSystems **B**rowser **E**nhancements
 
 A small Chrome extension that applies little enhancements to OutSystems platform
 frontends (Service Center, Lifetime, ODC Portal, Community pages, etc.).
