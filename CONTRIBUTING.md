@@ -20,10 +20,10 @@ it has the full list). `runner.js` is content-script-only.
 
 | File | Role |
 |------|------|
-| `src/registry.js`                  | Defines `OSEnhance.register(...)`, `OSEnhance.urlMatches(...)`, `OSEnhance.makeCtx(...)`, and a couple of optional helpers. Loads first. |
+| `src/registry.js`                  | Defines `OSEnhance.register(...)`, `OSEnhance.urlMatches(...)`, `OSEnhance.makeCtx(...)`, `OSEnhance.stamp` (the shared LOBE branding toolkit — see "LOBE styling"), and a couple of optional helpers. Loads first. |
 | `src/categories.js`                | The canonical, ordered list of categories. Loads second. |
 | `src/enhancements/<category>/*.js` | Enhancement files, in the subfolder for their category. A file calls `OSEnhance.register({...})` once per enhancement — usually one, but a file may register several related ones (see below). |
-| `src/runner.js`                    | **Content script only.** Picks the enhancements matching the current URL that the user has switched on (everything is off by default), injects their CSS and/or runs their `apply(ctx)`, re-syncs (debounced) whenever OutSystems re-renders the page, and reverts live when toggled off. |
+| `src/runner.js`                    | **Content script only.** Picks the enhancements matching the current URL that the user has switched on (everything is off by default), injects their CSS and/or runs their `apply(ctx)`, re-syncs (debounced) whenever OutSystems re-renders the page, and reverts live when toggled off. Also injects the shared LOBE stamp stylesheet, shows the global corner badge, and applies the "Mark LOBE changes" setting (see "LOBE styling"). |
 | `popup/`                           | Toolbar popup UI, one tab per category. `bootstrap.js` reads the script list from the manifest and injects the registry + enhancements (minus `runner.js`), then `popup.js` reads them directly (no messaging). |
 | `src/background.js`                | Service worker for the **per-domain opt-in**: registers content scripts for user-granted domains and re-asserts them on install/startup (see "Coverage / matched hosts"). |
 
@@ -185,10 +185,44 @@ Optional conveniences for use inside `apply()`:
   only writing when it isn't already that value (cheap + idempotent).
 - `OSEnhance.util.each(selector, fn, root?)` — iterate matching elements.
 
+### LOBE styling (the "stamp")
+
+LOBE marks its changes with a consistent honey-and-gold look plus its bee mascot, so
+it's clear at a glance which tweaks on a page are LOBE's. That styling is centralised
+in **`OSEnhance.stamp`** (in `registry.js`) — reach for it instead of hardcoding
+colours, and your enhancement will match the rest and respect the user's toggle (below).
+
+- **`stamp.baseCss`** — a stylesheet the runner injects once while any enhancement is
+  active. It declares the palette as CSS variables (`--lobe-honey`,
+  `--lobe-honey-hover`, `--lobe-gold`, `--lobe-ink`), so your `css` can just use
+  `var(--lobe-gold)` etc., plus a few reusable classes:
+  - `.ose-lobe-field` — the shared input accent (a thin gold left bar). Put it on any
+    field you touch — `ctx.addClass(input, "ose-lobe-field")` — so every affected
+    field looks the same.
+  - `.ose-lobe-stamp` — inline sizing for the bee mascot (see `stamp.bee()`).
+  - `.ose-lobe-mark` — tag *purely decorative* elements you add with this, so they
+    hide when the user turns marking off.
+- **`stamp.bee(doc?)`** — mints the bee mascot `<img>` (the web-accessible
+  `assets/lobe.svg`). Insert it and register cleanup, e.g.
+  `const bee = OSEnhance.stamp.bee(); node.prepend(bee); ctx.onCleanup(() => bee.remove());`
+- **The corner badge** — the runner shows a global "LOBE is active here" badge on any
+  page where something's on; you don't need to do anything for it.
+
+**The "Mark LOBE changes on page" toggle.** The popup's Settings overlay has one
+switch (default on, stored in `chrome.storage.sync` under `markChanges`). When it's
+off, the runner adds `.ose-marks-off` to `<html>`: the `--lobe-*` variables drop to a
+neutral grey/white and the decorative bits (bees, corner badge, field bars,
+`.ose-lobe-mark` elements) hide. Because every LOBE colour is a variable, anything you
+build on `stamp` follows the toggle automatically — no extra work. Only the LOBE
+*look* goes away; your enhancement keeps working.
+
 ### Guidelines for shareable enhancements
 
 - Put the file in the right category subfolder — that folder *is* its category
   (there's no `category` property to set).
+- Use **`OSEnhance.stamp`** for any LOBE styling (colours, the bee, field accents)
+  rather than hardcoding — it stays consistent and respects the "Mark LOBE changes"
+  toggle (see "LOBE styling").
 - Prefer `css` over `apply()` when styling can do the job, it's reversible and
   toggles off without a reload.
 - In `apply()`, make DOM changes through `ctx` (or provide `revert()`) so the

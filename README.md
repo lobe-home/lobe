@@ -54,6 +54,13 @@ The toolbar popup lets you:
 
 The popup follows your system's **light or dark theme** automatically.
 
+**Spotting LOBE's changes:** where LOBE alters a page it marks the change with its
+honey-and-gold styling and a little bee, and shows a small **LOBE** badge in the
+corner of any page it's active on (hover it to see what's on). Prefer the pages
+looking untouched? Open **Settings** in the footer and switch off **"Mark LOBE
+changes on page"** — the enhancements keep working, the LOBE styling just disappears
+(live, on every open tab).
+
 **Self-hosted or custom domains:** LOBE runs automatically on the standard OutSystems
 cloud hosts. On any *other* domain that looks like an OutSystems page, the popup
 shows a **"Run LOBE on this site"** switch — flip it on, approve Chrome's per-site
