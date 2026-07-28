@@ -16,8 +16,9 @@
 //
 // The full ids (e.g. wt82_..._wtBaseURLInput) have volatile, auto-generated wt*
 // segments, so we match only the stable "BaseURLInput" tail with an ends-with
-// selector, and select the wrapper via :has(). CSS-based, so it toggles off
-// cleanly (no reload).
+// selector, and select the wrapper via :has(). The widening is CSS; a small apply()
+// adds the shared LOBE field accent (.ose-lobe-field). Both toggle off cleanly (no
+// reload) — the <style> is removed and the class is dropped via ctx.
 
 OSEnhance.register({
   id: "widen-rest-api-base-url",
@@ -46,5 +47,14 @@ OSEnhance.register({
     input[id$="BaseURLInput"] {
       width: 800px !important;
     }
-  `
+  `,
+
+  // Widening is otherwise invisible, so mark the field with the shared LOBE input
+  // accent (the gold left bar in .ose-lobe-field) — the same accent used on every
+  // field LOBE touches. Added via ctx so it reverts live when switched off.
+  apply(ctx) {
+    for (const input of document.querySelectorAll('input[id$="BaseURLInput"]')) {
+      ctx.addClass(input, "ose-lobe-field");
+    }
+  }
 });

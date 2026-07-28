@@ -111,6 +111,114 @@ OSEnhance.util = OSEnhance.util || {
   }
 };
 
+// OSEnhance.stamp — the shared LOBE "stamp" toolkit, so every enhancement can carry
+// LOBE's look without copy-pasting the palette or the mascot markup.
+//
+//   • stamp.palette  — LOBE's honey/gold colours (kept here as the single source).
+//   • stamp.baseCss  — a small stylesheet the runner injects ONCE while any enhancement
+//                      is active. It declares the --lobe-* CSS variables (so an
+//                      enhancement's own css can just use var(--lobe-gold) etc.) and a
+//                      a few reusable classes:
+//                        .ose-lobe-stamp    the bee mascot, sized to sit inline
+//                        .ose-lobe-field    a subtle accent on a field tweaked in place
+//                        .ose-lobe-mark     "pure LOBE decoration" — hidden when the
+//                                           user turns off "Mark LOBE changes"
+//                        .ose-lobe-corner   the global "LOBE is active here" corner badge
+//                      It also carries the .ose-marks-off master switch (see below): the
+//                      runner sets it on <html> to strip all LOBE styling live.
+//   • stamp.bee(doc) — mint the LOBE bee mascot <img> (a web-accessible resource) for a
+//                      JS enhancement (or the runner) to drop onto the UI it injects.
+//
+// Enhancements reference these instead of repeating colours, so the branding stays
+// consistent and lives in one place.
+OSEnhance.stamp = OSEnhance.stamp || (function () {
+  const palette = {
+    honey: "#fbf5e7",       // chip / badge / control fill
+    honeyHover: "#f0e3c4",  // control hover/active fill (deeper honey)
+    gold: "#e7a92b",        // border / accent / field bar
+    ink: "#a9781a"          // text/ink on honey
+  };
+
+  const baseCss = `
+    :root {
+      --lobe-honey: ${palette.honey};
+      --lobe-honey-hover: ${palette.honeyHover};
+      --lobe-gold: ${palette.gold};
+      --lobe-ink: ${palette.ink};
+    }
+    /* The bee mascot, sized to sit inline with text. */
+    .ose-lobe-stamp {
+      width: 18px; height: 18px; flex: 0 0 auto;
+      display: inline-block; vertical-align: middle;
+    }
+    /* The consistent LOBE accent for ANY input an enhancement affects: a thin gold
+       bar down the field's left edge. Reused on every touched field so they match
+       (apply it with ctx.addClass(input, "ose-lobe-field")). */
+    .ose-lobe-field {
+      box-shadow: inset 3px 0 0 var(--lobe-gold) !important;
+    }
+    /* The global "LOBE is active here" corner badge — added by the runner whenever at
+       least one enhancement is active on the page, so even enhancements that only hide
+       content (nothing of their own to stamp) are still accounted for. */
+    .ose-lobe-corner {
+      position: fixed; right: 14px; bottom: 14px; z-index: 2147483000;
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 11px 5px 8px;
+      background: var(--lobe-honey);
+      border: 1.5px solid var(--lobe-gold);
+      border-radius: 999px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+      color: var(--lobe-ink);
+      font: 600 12px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      letter-spacing: 0.02em;
+      cursor: default; user-select: none;
+      opacity: 0.9;
+    }
+    .ose-lobe-corner:hover { opacity: 1; }
+    .ose-lobe-corner .ose-lobe-stamp { width: 17px; height: 17px; }
+    .ose-lobe-corner-count {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 16px; height: 16px; padding: 0 4px; box-sizing: border-box;
+      background: var(--lobe-gold); color: #fff;
+      border-radius: 999px; font-size: 11px; font-weight: 700;
+    }
+
+    /* "Mark LOBE changes on page" master switch (the popup's Settings). When the user
+       turns it OFF the runner adds .ose-marks-off to <html>, and LOBE's decoration
+       disappears LIVE: purely-decorative bits (bees, the corner badge, field bars,
+       any .ose-lobe-mark like the quick-range brand header) are hidden, and the
+       honey/gold palette drops to a neutral grey/white so injected controls fall back
+       to a plain look while still working. The enhancements themselves are untouched
+       — only their LOBE styling goes away. One override, because every LOBE colour is
+       a --lobe-* variable. */
+    :root.ose-marks-off {
+      --lobe-honey: #fff;
+      --lobe-honey-hover: #f0f0f0;
+      --lobe-gold: #bbb;
+      --lobe-ink: #444;
+    }
+    :root.ose-marks-off .ose-lobe-stamp,
+    :root.ose-marks-off .ose-lobe-mark,
+    :root.ose-marks-off .ose-lobe-corner { display: none !important; }
+    :root.ose-marks-off .ose-lobe-field { box-shadow: none !important; }
+  `;
+
+  // Mint the LOBE bee mascot <img> (assets/lobe.svg is web-accessible). Callers insert
+  // it and, in JS enhancements, register their own cleanup to remove it.
+  function bee(doc) {
+    const d = doc || document;
+    const img = d.createElement("img");
+    img.className = "ose-lobe-stamp";
+    img.alt = "LOBE";
+    if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.getURL) {
+      img.src = chrome.runtime.getURL("assets/lobe.svg");
+    }
+    return img;
+  }
+
+  return { palette, baseCss, bee };
+})();
+
 // Build the context object passed to apply(ctx). Every DOM change routed through
 // it records how to undo itself via `pushCleanup(fn)`, so the runner can revert a
 // JS enhancement live when it's switched off — no page reload. Changes you make

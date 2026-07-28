@@ -307,6 +307,20 @@ footer {
   font-size: calc(11px * var(--fs));
 }
 
+/* Footer left group: the Sites and Settings links. */
+.foot-links { display: flex; align-items: center; gap: 8px; }
+
+/* A single setting row (in the Settings overlay): title + description, switch at the
+   right — reuses .site-row for the card, .switch for the toggle. */
+.setting-info { flex: 1; min-width: 0; }
+.setting-title { font-weight: 600; }
+.setting-desc {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: calc(12px * var(--fs));
+}
+
 /* "Add this site" banner — at the bottom of the Sites overlay, above the footer. */
 .site-banner {
   display: flex;

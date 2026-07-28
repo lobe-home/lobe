@@ -103,7 +103,9 @@
         cursor: pointer;
         line-height: 0;
       }
-      .ose-url-copy:hover { color: #333; }
+      /* A gold hover is the LOBE cue — the icon is too small for the bee, and a
+         permanent honey tint would be too loud inline in a table. */
+      .ose-url-copy:hover { color: var(--lobe-ink); }
       .ose-url-copy.ose-copied { color: #1f7a34; }
     `,
 

@@ -25,23 +25,12 @@
 
     match: /\/servicecenter\/General_Logs\.aspx/i,
 
-    // A light LOBE touch on the field: honey/gold accent + focus glow (LOBE palette,
-    // see popup.css). A full, reusable stamp/branding pass is planned separately.
-    css: `
-      ${INPUT_SEL} {
-        border: 1.5px solid #e7a92b !important;   /* LOBE gold */
-        background: #fffdf7 !important;           /* LOBE off-white */
-        border-radius: 6px !important;
-      }
-      ${INPUT_SEL}:focus {
-        outline: none !important;
-        border-color: #a9781a !important;         /* LOBE deep gold */
-        box-shadow: 0 0 0 3px rgba(231, 169, 43, 0.25) !important; /* honey glow */
-      }
-    `,
-
+    // A light LOBE touch on the field comes from the shared .ose-lobe-field class
+    // (the gold left bar — the same accent used on every field LOBE affects), added
+    // in apply() below.
     apply(ctx) {
       for (const input of document.querySelectorAll(INPUT_SEL)) {
+        ctx.addClass(input, "ose-lobe-field"); // shared LOBE accent; removed on revert
         if (input.getAttribute("maxlength") === NEW_MAX) continue; // idempotent
         ctx.setAttr(input, "maxlength", NEW_MAX); // restores the original on revert
       }

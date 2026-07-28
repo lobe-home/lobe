@@ -8,6 +8,7 @@
 // writes chrome.storage.sync, which the page's content script observes and acts on.
 
 const STORAGE_KEY = "enabledEnhancements";
+const MARK_KEY = "markChanges"; // "Mark LOBE changes on page" (Settings) — default ON
 const ALL_ID = "all"; // synthetic first tab listing every enhancement
 
 const els = {
@@ -26,7 +27,11 @@ const els = {
   sitesView: document.getElementById("sitesView"),
   sitesList: document.getElementById("sitesList"),
   manageSites: document.getElementById("manageSites"),
-  sitesBack: document.getElementById("sitesBack")
+  sitesBack: document.getElementById("sitesBack"),
+  settingsView: document.getElementById("settingsView"),
+  openSettings: document.getElementById("openSettings"),
+  settingsBack: document.getElementById("settingsBack"),
+  markChangesSwitch: document.getElementById("markChangesSwitch")
 };
 
 let activeTab = null;
@@ -293,6 +298,24 @@ function renderSitesView() {
 function showSites(show) {
   if (show) { renderSitesView(); renderAddSiteBanner(); }
   els.sitesView.hidden = !show;
+}
+
+function showSettings(show) {
+  els.settingsView.hidden = !show;
+}
+
+// --- Settings overlay -----------------------------------------------------------
+// A single global preference: "Mark LOBE changes on page" (default ON). The popup
+// only writes chrome.storage.sync; each page's content script observes it and adds/
+// removes LOBE's styling live (see runner.js / the .ose-marks-off switch).
+async function initSettings() {
+  const stored = await chrome.storage.sync.get({ [MARK_KEY]: true });
+  els.markChangesSwitch.checked = stored[MARK_KEY] !== false; // absent/true => on
+  els.markChangesSwitch.addEventListener("change", () => {
+    chrome.storage.sync.set({ [MARK_KEY]: els.markChangesSwitch.checked });
+  });
+  els.openSettings.addEventListener("click", () => showSettings(true));
+  els.settingsBack.addEventListener("click", () => showSettings(false));
 }
 
 function showEmpty(message) {
@@ -565,6 +588,9 @@ async function main() {
   els.manageSites.addEventListener("click", () => showSites(true));
   els.sitesBack.addEventListener("click", () => showSites(false));
   updateSitesLink();
+
+  // Settings overlay ("Mark LOBE changes on page").
+  await initSettings();
 
   if (!reg || !reg._enhancements || !reg._enhancements.length) {
     showEmpty("No enhancements are registered.");

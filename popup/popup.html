@@ -50,8 +50,38 @@
       </div>
     </div>
 
+    <!-- Settings overlay (opened from the footer). -->
+    <div id="settingsView" class="sites-view" hidden>
+      <div class="sites-head">
+        <span class="sites-title">Settings</span>
+      </div>
+      <div class="sites-list">
+        <div class="site-row">
+          <div class="setting-info">
+            <span class="setting-title">Mark LOBE changes on page</span>
+            <span class="setting-desc"
+              >Show LOBE's honey/gold styling and bee stamps so you can see which
+              changes on a page are LOBE's. Turn this off to keep every enhancement
+              working but hide the LOBE look.</span
+            >
+          </div>
+          <label class="switch" title="Mark LOBE changes on page">
+            <input type="checkbox" id="markChangesSwitch" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+      <div class="sites-foot">
+        <button id="settingsBack" type="button" class="link-btn">← Back</button>
+      </div>
+    </div>
+
     <footer>
-      <button id="manageSites" type="button" class="link-btn">Sites</button>
+      <div class="foot-links">
+        <button id="manageSites" type="button" class="link-btn">Sites</button>
+        <span class="sep">·</span>
+        <button id="openSettings" type="button" class="link-btn">Settings</button>
+      </div>
       <div class="fontsize">
         <button id="fsDown" class="fs-btn" type="button" aria-label="Smaller text">A−</button>
         <span id="fsValue" class="fontsize-value">100%</span>

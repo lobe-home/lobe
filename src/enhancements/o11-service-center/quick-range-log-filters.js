@@ -181,6 +181,7 @@
     match: /\/servicecenter\/\w+_Logs?\.aspx/i,
 
     css: `
+      /* The toggle wears LOBE colours (shared --lobe-* vars from stamp.baseCss). */
       .ose-qr-toggle {
         box-sizing: border-box;
         display: inline-flex;
@@ -189,30 +190,45 @@
         width: 32px;
         height: 32px;
         padding: 0;
-        color: #333;
-        background: #fff;
-        border: 1px solid #bbb;
+        color: var(--lobe-ink);
+        background: var(--lobe-honey);
+        border: 1px solid var(--lobe-gold);
         border-radius: 5px;
         cursor: pointer;
         line-height: 0;
       }
-      .ose-qr-toggle:hover { background: #f0f0f0; border-color: #888; }
-      .ose-qr-toggle[aria-expanded="true"] { background: #e6e6e6; border-color: #888; }
+      .ose-qr-toggle:hover { background: var(--lobe-honey-hover); border-color: var(--lobe-ink); }
+      .ose-qr-toggle[aria-expanded="true"] { background: var(--lobe-honey-hover); border-color: var(--lobe-ink); }
 
       /* Anchored to <body> and fixed-positioned so the filter row's overflow /
-         stacking context can't clip it. The two sections sit side by side as
-         columns, so the whole thing stays short — no scrolling. */
+         stacking context can't clip it. It's a column: a LOBE-branded header on top,
+         then the two sections side by side as columns (so it stays short). */
       .ose-qr-menu {
         position: fixed;
         z-index: 2147483000;
         padding: 6px;
         background: #fff;
-        border: 1px solid #bbb;
+        border: 1px solid var(--lobe-gold);
         border-radius: 6px;
         box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
         display: none;
       }
-      .ose-qr-menu.ose-open { display: flex; gap: 4px; align-items: flex-start; }
+      .ose-qr-menu.ose-open { display: flex; flex-direction: column; }
+      /* LOBE stamp on the menu: the bee + a wordmark above the range columns. */
+      .ose-qr-brand {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 2px 6px 6px;
+        margin-bottom: 4px;
+        border-bottom: 1px solid #eee;
+        color: var(--lobe-ink);
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .ose-qr-cols { display: flex; gap: 4px; align-items: flex-start; }
       .ose-qr-group {
         display: flex;
         flex-direction: column;
@@ -274,6 +290,15 @@
       wrap.appendChild(toggle);
 
       const menu = ctx.createElement("div", { class: "ose-qr-menu", role: "menu" });
+
+      // LOBE stamp: the bee + wordmark above the range columns. Tagged .ose-lobe-mark
+      // (pure decoration) so it vanishes when "Mark LOBE changes" is turned off.
+      const brand = ctx.createElement("div", { class: "ose-qr-brand ose-lobe-mark" });
+      brand.appendChild(OSEnhance.stamp.bee(document));
+      brand.appendChild(ctx.createElement("span", { text: "LOBE quick range" }));
+      menu.appendChild(brand);
+
+      const cols = ctx.createElement("div", { class: "ose-qr-cols" });
       const sections = [
         { header: "Last", items: RELATIVE.map((r) => ({ label: r.label, run: () => applyLastHours(r.hours) })) },
         { header: "On", items: buildDays() }
@@ -294,8 +319,9 @@
           });
           group.appendChild(item);
         });
-        menu.appendChild(group);
+        cols.appendChild(group);
       });
+      menu.appendChild(cols);
 
       let open = false;
 

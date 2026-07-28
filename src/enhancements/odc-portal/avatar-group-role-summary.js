@@ -41,9 +41,9 @@
       /* Hide the avatar pile — the summary text stands in for it. */
       .avatar-group-list { display: none !important; }
 
-      /* The counter chip becomes a little LOBE "stamp": honey fill, gold border and
-         ink, the bee mascot, a touch bigger. The colours are LOBE's palette (see
-         popup.css); sizes are easy to tweak. */
+      /* The counter chip becomes a LOBE "stamp": the honey/gold look (via the shared
+         --lobe-* palette from stamp.baseCss) plus the bee, a touch bigger. Only the
+         page-specific sizing lives here; the colours are LOBE's single source. */
       .avatar-group-counter {
         display: inline-flex !important;
         align-items: center !important;
@@ -53,9 +53,9 @@
         height: auto !important;
         padding: 6px 30px !important;
         border-radius: 18px !important;
-        border: 2px solid #e7a92b !important;   /* LOBE gold */
-        background: #fbf5e7 !important;          /* LOBE honey */
-        color: #a9781a !important;               /* LOBE deep gold ink */
+        border: 2px solid var(--lobe-gold) !important;
+        background: var(--lobe-honey) !important;
+        color: var(--lobe-ink) !important;
         overflow: visible !important;
         justify-content: center !important;      /* centre the bee + text in the wider chip */
         white-space: nowrap !important;
@@ -66,8 +66,8 @@
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14) !important;
       }
       .avatar-group-counter > span { font-size: inherit !important; color: inherit !important; }
-      /* The LOBE bee mascot, stamped in front of the text. */
-      .ose-lobe-stamp { width: 22px !important; height: 22px !important; flex: 0 0 auto !important; }
+      /* Bump the shared bee (.ose-lobe-stamp, 18px) up for this larger chip. */
+      .avatar-group-counter .ose-lobe-stamp { width: 22px !important; height: 22px !important; }
     `,
 
     // ctx-routed so the runner can restore the counter text, unhide the tooltip, and
@@ -85,12 +85,8 @@
         span.textContent = text;
         ctx.onCleanup(() => { span.textContent = prev; });
 
-        // Stamp the LOBE bee in front of the text (web-accessible resource).
-        const stamp = ctx.createElement("img", {
-          class: "ose-lobe-stamp",
-          src: chrome.runtime.getURL("assets/lobe.svg"),
-          alt: "LOBE"
-        });
+        // Stamp the LOBE bee in front of the text (shared mascot factory).
+        const stamp = OSEnhance.stamp.bee(document);
         counter.insertBefore(stamp, counter.firstChild);
         ctx.onCleanup(() => stamp.remove());
 
