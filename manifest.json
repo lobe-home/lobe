@@ -44,6 +44,7 @@
         "src/enhancements/odc-portal/avatar-group-role-summary.js",
         "src/enhancements/outsystems-forums/hide-forum-2026-bg-sections.js",
         "src/enhancements/outsystems-forums/hide-ranking.js",
+        "src/enhancements/outsystems-forums/hide-nonpublic-neo-contributions.js",
         "src/runner.js"
       ],
       "run_at": "document_idle",
