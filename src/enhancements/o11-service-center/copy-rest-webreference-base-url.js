@@ -114,11 +114,11 @@
       /* LOBE stamp: honey/gold, only while marking is on (too small to hold the bee). */
       :root:not(.ose-marks-off) .ose-copy-btn {
         color: var(--lobe-ink);
-        background: var(--lobe-honey);
+        background: var(--lobe-tint);
         border-color: var(--lobe-gold);
       }
       :root:not(.ose-marks-off) .ose-copy-btn:hover {
-        background: var(--lobe-honey-hover);
+        background: var(--lobe-tint-hover);
         border-color: var(--lobe-ink);
       }
     `,

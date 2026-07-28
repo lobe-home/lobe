@@ -114,7 +114,8 @@ OSEnhance.util = OSEnhance.util || {
 // OSEnhance.stamp — the shared LOBE "stamp" toolkit, so every enhancement can carry
 // LOBE's look without copy-pasting the palette or the mascot markup.
 //
-//   • stamp.palette  — LOBE's honey/gold colours (kept here as the single source).
+//   • stamp.palette  — LOBE's colours (a translucent gold tint, a gold accent and ink),
+//                      light + dark; the single source.
 //   • stamp.baseCss  — a small stylesheet the runner injects ONCE while any enhancement
 //                      is active. It declares the --lobe-* CSS variables (so an
 //                      enhancement's own css can just use var(--lobe-gold) etc.) and a
@@ -133,15 +134,17 @@ OSEnhance.util = OSEnhance.util || {
 // consistent and lives in one place.
 OSEnhance.stamp = OSEnhance.stamp || (function () {
   const palette = {
-    honey: "#fbf5e7",       // chip / badge / control fill
-    honeyHover: "#f0e3c4",  // control hover/active fill (deeper honey)
+    // Background is a translucent gold TINT laid over the element's own parent
+    // background — not an opaque fill — so a stamped element just gets a gold-yellow
+    // hue over whatever's behind it (and adapts to any background).
+    tint: "rgba(231, 169, 43, 0.28)",
+    tintHover: "rgba(231, 169, 43, 0.40)",
     gold: "#e7a92b",        // border / accent / field bar
-    ink: "#a9781a",         // text/ink on honey
-    // Dark-theme variants — mirror the popup's prefers-color-scheme palette
-    // (popup.css: --card #2a251e, --accent / --accent-ink #f6c445).
+    ink: "#a9781a",         // text / ink
+    // Dark-theme variants — mirror the popup's prefers-color-scheme accent (#f6c445).
     dark: {
-      honey: "#2a251e",
-      honeyHover: "#38322a",
+      tint: "rgba(246, 196, 69, 0.30)",
+      tintHover: "rgba(246, 196, 69, 0.42)",
       gold: "#f6c445",
       ink: "#f6c445"
     }
@@ -149,8 +152,8 @@ OSEnhance.stamp = OSEnhance.stamp || (function () {
 
   const baseCss = `
     :root {
-      --lobe-honey: ${palette.honey};
-      --lobe-honey-hover: ${palette.honeyHover};
+      --lobe-tint: ${palette.tint};
+      --lobe-tint-hover: ${palette.tintHover};
       --lobe-gold: ${palette.gold};
       --lobe-ink: ${palette.ink};
     }
@@ -172,7 +175,7 @@ OSEnhance.stamp = OSEnhance.stamp || (function () {
       position: fixed; right: 14px; bottom: 14px; z-index: 2147483000;
       display: inline-flex; align-items: center; gap: 6px;
       padding: 5px 11px 5px 8px;
-      background: var(--lobe-honey);
+      background: var(--lobe-tint);
       border: 1.5px solid var(--lobe-gold);
       border-radius: 999px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
@@ -191,27 +194,32 @@ OSEnhance.stamp = OSEnhance.stamp || (function () {
       border-radius: 999px; font-size: 11px; font-weight: 700;
     }
 
-    /* "Mark LOBE changes on page" master switch (the popup's Settings). When the user
-       turns it OFF the runner adds .ose-marks-off to <html>, and LOBE does as LITTLE as
-       possible: it removes the decoration it added ITSELF — the bees, the corner badge,
-       any .ose-lobe-mark, and the .ose-lobe-field accent bar. It deliberately does NOT
-       remap the palette to any default (no forced neutral, no forced transparent): the
-       page keeps whatever it natively had. Each enhancement stops applying its OWN LOBE
-       colours by gating its colour rules behind :root:not(.ose-marks-off) while
-       keeping its functional size/layout (an enhancement may still opt to style its
-       own off-state — that's its choice, not an automatic default). */
+    /* Two independent master switches (the popup's Settings), applied by the runner as
+       classes on <html>:
+
+       .ose-marks-off — "Mark LOBE changes on page" OFF. LOBE does as LITTLE as possible:
+       it removes the per-enhancement decoration it added itself (the bees and any
+       .ose-lobe-mark, the .ose-lobe-field accent bar), and each enhancement stops
+       applying its OWN colours (they gate colour behind :root:not(.ose-marks-off) while
+       keeping functional size/layout). It imposes NO default — no forced neutral, no
+       forced transparent — so the page keeps whatever it natively had. The corner tag
+       is NOT governed by this switch (see below), so its own bee stays shown.
+
+       .ose-tag-off — "Show LOBE active tag on page" OFF. Hides just the corner badge. */
     :root.ose-marks-off .ose-lobe-stamp,
-    :root.ose-marks-off .ose-lobe-mark,
-    :root.ose-marks-off .ose-lobe-corner { display: none !important; }
+    :root.ose-marks-off .ose-lobe-mark { display: none !important; }
     :root.ose-marks-off .ose-lobe-field { box-shadow: none !important; }
+    /* The corner tag's own bee belongs to the tag, not the "Mark changes" switch. */
+    :root.ose-marks-off .ose-lobe-corner .ose-lobe-stamp { display: inline-block !important; }
+    :root.ose-tag-off .ose-lobe-corner { display: none !important; }
 
     /* Dark theme — the stamp follows the browser's light/dark preference the same way
        the popup does (@media prefers-color-scheme, mirroring popup.css): swap the LOBE
        palette to its dark variants. Placed last so these win by source order. */
     @media (prefers-color-scheme: dark) {
       :root {
-        --lobe-honey: ${palette.dark.honey};
-        --lobe-honey-hover: ${palette.dark.honeyHover};
+        --lobe-tint: ${palette.dark.tint};
+        --lobe-tint-hover: ${palette.dark.tintHover};
         --lobe-gold: ${palette.dark.gold};
         --lobe-ink: ${palette.dark.ink};
       }

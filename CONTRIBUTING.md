@@ -193,9 +193,11 @@ in **`OSEnhance.stamp`** (in `registry.js`) — reach for it instead of hardcodi
 colours, and your enhancement will match the rest and respect the user's toggle (below).
 
 - **`stamp.baseCss`** — a stylesheet the runner injects once while any enhancement is
-  active. It declares the palette as CSS variables (`--lobe-honey`,
-  `--lobe-honey-hover`, `--lobe-gold`, `--lobe-ink`), so your `css` can just use
-  `var(--lobe-gold)` etc. The palette is **theme-aware**: it swaps to LOBE's dark
+  active. It declares the palette as CSS variables (`--lobe-tint` and
+  `--lobe-tint-hover`, a translucent gold background tint; `--lobe-gold` accent;
+  `--lobe-ink` text), so your `css` can just use `var(--lobe-gold)` etc. Use
+  `--lobe-tint` for backgrounds — it's translucent, so the element keeps a hint of its
+  parent's background rather than an opaque fill. The palette is **theme-aware**: it swaps to LOBE's dark
   variants under `@media (prefers-color-scheme: dark)`, the same way the popup themes
   itself — so as long as you drive colour through the variables, your stamp follows
   light/dark automatically. It also provides a few reusable classes:
@@ -209,14 +211,20 @@ colours, and your enhancement will match the rest and respect the user's toggle 
   `assets/lobe.svg`). Insert it and register cleanup, e.g.
   `const bee = OSEnhance.stamp.bee(); node.prepend(bee); ctx.onCleanup(() => bee.remove());`
 - **The corner badge** — the runner shows a global "LOBE is active here" badge on any
-  page where something's on; you don't need to do anything for it.
+  page where something's on; you don't need to do anything for it. It has its own
+  Settings toggle (below), independent of the marking.
 
-**The "Mark LOBE changes on page" toggle.** The popup's Settings overlay has one
-switch (default on, stored in `chrome.storage.sync` under `markChanges`). When it's
-off, the runner adds `.ose-marks-off` to `<html>` and LOBE does as *little* as
-possible: it hides the decoration it added itself (bees, corner badge, `.ose-lobe-mark`
-elements, the `.ose-lobe-field` bar) and otherwise **imposes nothing** — no forced
-neutral, no forced transparent. The page keeps whatever it natively had.
+**The two Settings toggles.** The popup's Settings overlay has two switches, both
+default on and stored in `chrome.storage.sync`; the runner applies each as a class on
+`<html>`:
+
+- **"Mark LOBE changes on page"** (`markChanges` → `.ose-marks-off`). When off, LOBE
+  does as *little* as possible: it hides the per-enhancement decoration it added itself
+  (bees, `.ose-lobe-mark` elements, the `.ose-lobe-field` bar) and otherwise **imposes
+  nothing** — no forced neutral, no forced transparent. The page keeps whatever it
+  natively had.
+- **"Show LOBE active tag on page"** (`showActiveTag` → `.ose-tag-off`). When off, just
+  the corner badge is hidden. It is *not* affected by the marking switch.
 
 So when you add colour, **gate it so it only applies while marking is on** — put the
 colour rules under `:root:not(.ose-marks-off) <your-selector>` and keep the enhancement's
@@ -227,7 +235,7 @@ colour rules under `:root:not(.ose-marks-off) <your-selector>` and keep the enha
 .my-widget { min-width: 340px; padding: 6px 30px; font-size: 16px; }
 /* LOBE stamp — only while marking is on: the colours. */
 :root:not(.ose-marks-off) .my-widget {
-  background: var(--lobe-honey); color: var(--lobe-ink); border: 1px solid var(--lobe-gold);
+  background: var(--lobe-tint); color: var(--lobe-ink); border: 1px solid var(--lobe-gold);
 }
 ```
 

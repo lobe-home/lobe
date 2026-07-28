@@ -9,6 +9,7 @@
 
 const STORAGE_KEY = "enabledEnhancements";
 const MARK_KEY = "markChanges"; // "Mark LOBE changes on page" (Settings) — default ON
+const TAG_KEY = "showActiveTag"; // "Show LOBE active tag on page" (Settings) — default ON
 const ALL_ID = "all"; // synthetic first tab listing every enhancement
 
 const els = {
@@ -31,7 +32,8 @@ const els = {
   settingsView: document.getElementById("settingsView"),
   openSettings: document.getElementById("openSettings"),
   settingsBack: document.getElementById("settingsBack"),
-  markChangesSwitch: document.getElementById("markChangesSwitch")
+  markChangesSwitch: document.getElementById("markChangesSwitch"),
+  showActiveTagSwitch: document.getElementById("showActiveTagSwitch")
 };
 
 let activeTab = null;
@@ -305,14 +307,19 @@ function showSettings(show) {
 }
 
 // --- Settings overlay -----------------------------------------------------------
-// A single global preference: "Mark LOBE changes on page" (default ON). The popup
-// only writes chrome.storage.sync; each page's content script observes it and adds/
-// removes LOBE's styling live (see runner.js / the .ose-marks-off switch).
+// Two global preferences, both default ON: "Mark LOBE changes on page" (the on-element
+// styling) and "Show LOBE active tag on page" (the corner badge). The popup only writes
+// chrome.storage.sync; each page's content script observes it and adds/removes the
+// relevant class live (see runner.js / the .ose-marks-off and .ose-tag-off switches).
 async function initSettings() {
-  const stored = await chrome.storage.sync.get({ [MARK_KEY]: true });
+  const stored = await chrome.storage.sync.get({ [MARK_KEY]: true, [TAG_KEY]: true });
   els.markChangesSwitch.checked = stored[MARK_KEY] !== false; // absent/true => on
   els.markChangesSwitch.addEventListener("change", () => {
     chrome.storage.sync.set({ [MARK_KEY]: els.markChangesSwitch.checked });
+  });
+  els.showActiveTagSwitch.checked = stored[TAG_KEY] !== false; // absent/true => on
+  els.showActiveTagSwitch.addEventListener("change", () => {
+    chrome.storage.sync.set({ [TAG_KEY]: els.showActiveTagSwitch.checked });
   });
   els.openSettings.addEventListener("click", () => showSettings(true));
   els.settingsBack.addEventListener("click", () => showSettings(false));

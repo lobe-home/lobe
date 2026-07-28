@@ -76,12 +76,13 @@
       .avatar-group-counter > span { font-size: inherit !important; color: inherit !important; }
 
       /* The LOBE stamp — the coloured surface ONLY — while marking is on (i.e. <html>
-         has no .ose-marks-off): the honey/gold fill, border and shadow (via the shared
-         --lobe-* palette). With marks off none of it applies, so the label shows in the
-         page's native colours — same shape/size, just no LOBE colour. */
+         has no .ose-marks-off): a translucent gold tint (keeps a hint of the page's own
+         background), gold border and shadow (via the shared --lobe-* palette). With
+         marks off none of it applies, so the label shows in the page's native colours —
+         same shape/size, just no LOBE colour. */
       :root:not(.ose-marks-off) .avatar-group-counter {
         border: 2px solid var(--lobe-gold) !important;
-        background: var(--lobe-honey) !important;
+        background: var(--lobe-tint) !important;
         color: var(--lobe-ink) !important;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14) !important;
       }

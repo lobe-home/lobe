@@ -17,7 +17,8 @@
   }
 
   const STORAGE_KEY = "enabledEnhancements";
-  const MARK_KEY = "markChanges";   // "Mark LOBE changes on page" (Settings) — default ON
+  const MARK_KEY = "markChanges";     // "Mark LOBE changes on page" (Settings) — default ON
+  const TAG_KEY = "showActiveTag";    // "Show LOBE active tag on page" (Settings) — default ON
   // The current URL. On SPA platforms (e.g. the ODC Portal) navigation changes the URL
   // via the History API without reloading the content script, so this must be re-read,
   // not captured once — otherwise enhancements match the wrong (stale) page: they fail
@@ -25,7 +26,8 @@
   // sync() refreshes it every run.
   let href = location.href;
   let enabled = new Set(); // ids the user has switched ON (default: everything off)
-  let markOn = true;       // show LOBE's stamp/branding (default ON; user can turn off)
+  let markOn = true;       // show LOBE's per-enhancement stamp/branding (default ON)
+  let tagOn = true;        // show the corner "LOBE active" tag (default ON)
 
   const injectedStyles = new Map(); // id -> <style> element
   const cleanups = new Map();       // id -> array of teardown fns (from ctx)
@@ -97,6 +99,10 @@
   // doesn't feed the MutationObserver.)
   function applyMarkClass() {
     document.documentElement.classList.toggle("ose-marks-off", !markOn);
+  }
+  // Same idea for the corner "LOBE active" tag — an independent Settings switch.
+  function applyTagClass() {
+    document.documentElement.classList.toggle("ose-tag-off", !tagOn);
   }
 
   function ensureSharedStyle() {
@@ -200,6 +206,10 @@
       markOn = changes[MARK_KEY].newValue !== false; // absent/true => on
       applyMarkClass();
     }
+    if (changes[TAG_KEY]) {
+      tagOn = changes[TAG_KEY].newValue !== false; // absent/true => on
+      applyTagClass();
+    }
   }
   chrome.storage.onChanged.addListener(onStorageChanged);
 
@@ -218,6 +228,7 @@
     removeCorner();      // drop the global badge and shared stamp stylesheet too
     removeSharedStyle();
     document.documentElement.classList.remove("ose-marks-off");
+    document.documentElement.classList.remove("ose-tag-off");
     enabled = new Set(); // a stray sync() must not re-apply anything
     if (observer) {
       observer.disconnect();
@@ -270,12 +281,17 @@
     window.addEventListener("hashchange", sync);
   }
 
-  // Load the user's enabled set + the "mark changes" setting, then start. Nothing runs
-  // until the user opts in; marking defaults ON.
-  chrome.storage.sync.get({ [STORAGE_KEY]: [], [MARK_KEY]: true }, (res) => {
-    enabled = new Set(res[STORAGE_KEY] || []);
-    markOn = res[MARK_KEY] !== false;
-    applyMarkClass();
-    start();
-  });
+  // Load the user's enabled set + both Settings toggles, then start. Nothing runs until
+  // the user opts in; marking and the active tag both default ON.
+  chrome.storage.sync.get(
+    { [STORAGE_KEY]: [], [MARK_KEY]: true, [TAG_KEY]: true },
+    (res) => {
+      enabled = new Set(res[STORAGE_KEY] || []);
+      markOn = res[MARK_KEY] !== false;
+      tagOn = res[TAG_KEY] !== false;
+      applyMarkClass();
+      applyTagClass();
+      start();
+    }
+  );
 })();

@@ -271,12 +271,12 @@
          is on. With marks off these don't apply, leaving the neutral base above. */
       :root:not(.ose-marks-off) .ose-qr-toggle {
         color: var(--lobe-ink);
-        background: var(--lobe-honey);
+        background: var(--lobe-tint);
         border-color: var(--lobe-gold);
       }
       :root:not(.ose-marks-off) .ose-qr-toggle:hover,
       :root:not(.ose-marks-off) .ose-qr-toggle[aria-expanded="true"] {
-        background: var(--lobe-honey-hover);
+        background: var(--lobe-tint-hover);
         border-color: var(--lobe-ink);
       }
       :root:not(.ose-marks-off) .ose-qr-menu { border-color: var(--lobe-gold); }
