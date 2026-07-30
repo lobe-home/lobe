@@ -1,8 +1,9 @@
 // registry.js — the shared registry every enhancement plugs into.
 // Loaded FIRST (before categories.js, the enhancement files, and runner.js).
 //
-// An enhancement is a plain object with an `id`, a `category`, a `match`, and at
-// least one of `css` and `apply`:
+// An enhancement is a plain object with an `id`, a `match`, and at least one of
+// `css` and `apply` (its category is NOT a property — it's taken from the folder
+// the file lives in; see the note further down):
 //
 //   {
 //     id:          "unique-kebab-id",        // required, unique
